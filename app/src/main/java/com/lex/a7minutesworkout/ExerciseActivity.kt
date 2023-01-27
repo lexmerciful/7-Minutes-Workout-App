@@ -1,5 +1,6 @@
 package com.lex.a7minutesworkout
 
+import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +10,7 @@ import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.lex.a7minutesworkout.databinding.ActivityExerciseBinding
 import java.util.*
 import kotlin.collections.ArrayList
@@ -37,6 +39,9 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     //Media Player Variable
     private var player : MediaPlayer? = null
 
+    //Adapter Variable
+    private var exerciseAdapter: ExerciseStatusAdapter? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityExerciseBinding.inflate(layoutInflater)
@@ -59,6 +64,14 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         tts = TextToSpeech(this,this)
 
         setupRestView()
+        setupExerciseStatusRecyclerView()
+    }
+
+    private fun setupExerciseStatusRecyclerView(){
+        binding?.rvExerciseStatus?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        exerciseAdapter = ExerciseStatusAdapter(exerciseList!!)
+        binding?.rvExerciseStatus?.adapter = exerciseAdapter
     }
 
     private fun setRestProgressBar() {
@@ -72,6 +85,10 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             }
             override fun onFinish() {
                 currentExercisePosition++
+
+                exerciseList!![currentExercisePosition].isSelected = true
+                exerciseAdapter!!.notifyDataSetChanged()
+
                 setupExerciseView()
             }
         }.start()
@@ -89,13 +106,20 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 binding?.tvTimerExercise?.text = (timeSet - exerciseProgress).toString()
             }
             override fun onFinish() {
-                if (currentExercisePosition < exerciseList!!.size){
+                if (currentExercisePosition < exerciseList!!.size - 1){
                     Toast.makeText(this@ExerciseActivity, "Exercise Completed", Toast.LENGTH_SHORT).show()
                     speakText("${exerciseList!![currentExercisePosition].name} Completed")
+
+                    exerciseList!![currentExercisePosition].isCompleted = true
+                    exerciseList!![currentExercisePosition].isSelected = false
+                    exerciseAdapter!!.notifyDataSetChanged()
+
                     setupRestView()
                 }
                 else{
-                    Toast.makeText(this@ExerciseActivity, "Congratulations!! You've Completed All Exercises", Toast.LENGTH_SHORT).show()
+                    finish()
+                    val intent = Intent(this@ExerciseActivity, FinishActivity::class.java)
+                    startActivity(intent)
                 }
             }
         }.start()

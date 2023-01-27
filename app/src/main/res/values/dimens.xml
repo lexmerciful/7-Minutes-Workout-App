@@ -3,5 +3,6 @@
 
     <dimen name="main_screen_layout_padding">5dp</dimen>
     <dimen name="default_button_text_size">22sp</dimen>
+    <dimen name="finish_activity_margin_top">35dp</dimen>
 
 </resources>
