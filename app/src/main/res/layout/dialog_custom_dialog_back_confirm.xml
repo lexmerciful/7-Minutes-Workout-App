@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:textColor="@color/lighterBlack"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:text="Are you sure?"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:layout_marginTop="10dp"
+        android:textColor="@color/lighterBlack"
+        android:textSize="18sp"
+        android:text="@string/back_confirm_dialog_text"
+        android:gravity="center"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnYes"
+            android:textSize="18sp"
+            android:textColor="@color/white"
+            android:text="YES"
+            android:background="@drawable/item_button_curve"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnNo"
+            android:textSize="18sp"
+            android:textColor="@color/white"
+            android:text="NO"
+            android:background="@drawable/item_button_curve"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+</LinearLayout>

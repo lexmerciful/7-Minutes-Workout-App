@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">7 Minutes Workout</string>
+    <string name="back_confirm_dialog_text">This will stop your workout. You\'ve come far, are you sure you want to quit?</string>
+    <string name="BMI_Note_text">Oops! You really need to take care of your body more! Workout more maybe</string>
 </resources>

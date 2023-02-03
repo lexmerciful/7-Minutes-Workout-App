@@ -1,8 +1,10 @@
 package com.lex.a7minutesworkout
 
+import android.app.Dialog
 import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -10,8 +12,15 @@ import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.lex.a7minutesworkout.databinding.ActivityExerciseBinding
+import com.lex.a7minutesworkout.databinding.DialogCustomDialogBackConfirmBinding
+import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -21,12 +30,12 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     //Rest Timer Variables
     private var restTimer : CountDownTimer? = null
-    private var restTimerDuration : Long = 10000
+    private var restTimerDuration : Long = 1000
     private var restProgress = 0
 
     //Exercise Timer Variables
     private var exerciseTimer : CountDownTimer? = null
-    private var exerciseTimerDuration : Long = 30000
+    private var exerciseTimerDuration : Long = 1000
     private var exerciseProgress = 0
 
     //Exercise Array List Variables
@@ -67,6 +76,28 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         setupExerciseStatusRecyclerView()
     }
 
+    private fun customDialogForBackButton(){
+        val customDialogBack = Dialog(this)
+        val dialogBinding = DialogCustomDialogBackConfirmBinding.inflate(layoutInflater)
+        customDialogBack.setContentView(dialogBinding.root)
+        customDialogBack.setCancelable(false)
+
+        dialogBinding.btnYes.setOnClickListener {
+            this@ExerciseActivity.finish()
+            customDialogBack.dismiss()
+        }
+        dialogBinding.btnNo.setOnClickListener {
+            customDialogBack.dismiss()
+        }
+
+        customDialogBack.show()
+    }
+
+    override fun onBackPressed() {
+        customDialogForBackButton()
+        //super.onBackPressed()
+    }
+
     private fun setupExerciseStatusRecyclerView(){
         binding?.rvExerciseStatus?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
@@ -105,6 +136,7 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 binding?.progressBarExercise?.progress = (timeSet - exerciseProgress).toInt()
                 binding?.tvTimerExercise?.text = (timeSet - exerciseProgress).toString()
             }
+            @RequiresApi(Build.VERSION_CODES.O)
             override fun onFinish() {
                 if (currentExercisePosition < exerciseList!!.size - 1){
                     Toast.makeText(this@ExerciseActivity, "Exercise Completed", Toast.LENGTH_SHORT).show()
@@ -118,6 +150,10 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 }
                 else{
                     finish()
+                    //Get HistoryDao with instance of Database
+                    val historyDao = (application as HistoryApp).db.historyDao()
+
+                    addCompletedToHistory(historyDao)
                     val intent = Intent(this@ExerciseActivity, FinishActivity::class.java)
                     startActivity(intent)
                 }
@@ -173,6 +209,23 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         binding?.tvExerciseName?.text = exerciseList!![currentExercisePosition].name
 
         setExerciseProgressBar()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun addCompletedToHistory(historyDao: HistoryDao){
+        val itemPosition = ""
+        val current = LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
+        val formatted = current.format(formatter)
+        val itemDate = formatted
+
+        if (itemDate != null){
+            lifecycleScope.launch {
+                historyDao.insert(HistoryEntity(date = itemDate))
+            }
+        }else{
+            Log.e("SAVED: ", "Failed!!!")
+        }
     }
 
     override fun onDestroy() {

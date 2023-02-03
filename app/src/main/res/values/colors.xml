@@ -15,4 +15,5 @@
     <color name="toolbarColorControlNormal">#000000</color>
     <color name="grey">#D4DEE7</color>
     <color name="lighterBlack">#212121</color>
+    <color name="deepGrey">#9AA2AF</color>
 </resources>
